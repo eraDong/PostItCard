@@ -40,6 +40,7 @@ const formatISODate = (isoString) => {
 const deleteCardService = async (id) => {
     await deleteCard(id)
     getAllCardsService()
+    dialogVisible.value = false
 }
 
 const handleClosed = async (cardId) => {

@@ -33,7 +33,8 @@ const addContent = async () => {
     cardData.append('visible', 1)
     await addCard(cardData)
     dialogVisible.value = false
-    Router.push('/home')
+    
+    Router.go(0)
 }
 
 const handleClosed = () => {

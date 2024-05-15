@@ -1,29 +1,19 @@
 # postItCard
 
-This template should help get you started developing with Vue 3 in Vite.
+## 项目背景
 
-## Recommended IDE Setup
+大三下学期Javaweb课程作业，题目为PostItCard
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## 项目搭建
 
-## Customize configuration
+基于Springboot+vue.js+elementplus搭建
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+前端目录为根目录，后端目录为postItCardServer
 
-## Project Setup
+## 项目演示
 
-```sh
-pnpm install
-```
+![5ZLVZ_L3N`_NS8VW1D_P2V2.png](https://img2.imgtp.com/2024/05/15/CunC1nxs.png)
 
-### Compile and Hot-Reload for Development
+![_BO4UOBRSOC1__AK1_ZWQOV.png](https://img2.imgtp.com/2024/05/15/sRJ8bEFZ.png)
 
-```sh
-pnpm dev
-```
-
-### Compile and Minify for Production
-
-```sh
-pnpm build
-```
+![_XL_W_EW3XX1_`5IR__XQE6.png](https://img2.imgtp.com/2024/05/15/IbRJk6G4.png)
