@@ -61,4 +61,9 @@ public class CardController {
         CardModel updatedCard = cardService.editCard(id, cardTitle, cardBody, publicationDate, expirationDate,visible);
         return new ResponseEntity<>(updatedCard, HttpStatus.OK);
     }
+
+    @GetMapping("/search")
+    public List<CardModel> searchCardsByTitle(@RequestParam("cardTitle") String cardTitle) {
+        return cardService.searchByTitle(cardTitle);
+    }
 }

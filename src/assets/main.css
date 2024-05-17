@@ -26,3 +26,29 @@ a,
 @media (min-width: 1024px) {
 
 }
+
+.el-pagination button{
+  background-color: transparent !important;
+  color: hsla(160, 100%, 37%, 1) !important;
+}
+
+.el-pagination li {
+  color: hsla(160, 100%, 37%, 1) !important;
+  background-color: transparent !important;
+}
+
+.el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev, .el-pagination.is-background .el-pager li {
+  color: hsla(160, 100%, 37%, 1) !important;
+  background-color: transparent !important;
+}
+
+
+.el-pagination li:hover {
+  background-color: hsla(160, 100%, 37%, 0.2) !important;
+}
+
+.btn-next:hover,.btn-prev:hover {
+  background-color: hsla(160, 100%, 37%, 0.2) !important;
+}
+
+

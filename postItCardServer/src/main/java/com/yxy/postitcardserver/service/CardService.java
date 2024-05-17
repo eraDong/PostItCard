@@ -72,4 +72,8 @@ public class CardService {
         // 保存更新后的卡片并返回
         return cardRepository.save(existingCard);
     }
+
+    public List<CardModel> searchByTitle(String title) {
+        return cardRepository.findByCardTitleContaining(title);
+    }
 }

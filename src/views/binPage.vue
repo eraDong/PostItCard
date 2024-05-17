@@ -1,7 +1,7 @@
 <script setup>
 // 导入
-import {ref} from 'vue'
-import {getAllCards,deleteCard,updateCard} from '@/api/card'
+import {ref,watch} from 'vue'
+import {getAllCards,deleteCard,updateCard,searchCard} from '@/api/card'
 
 
 // 变量
@@ -13,20 +13,44 @@ let cardBody = ref('')
 let publicationDate = ref('')
 let expirationDate = ref('')
 let editMode = ref(false)
-let checkedList = ref([])
 let isChecked = ref(true)
+let searchInput = ref('')
+let currentPage = ref(1)
+const itemsPerPage = ref(5) // 默认每页显示10条数据
+let totalCards = ref(0)
+let displayCardArr = ref([])
+
+// 监听 currentPage 的变化并相应地更新数据
+watch(currentPage, () => {
+    getAllCardsService() // 获取当前页的数据
+})
+
+watch(itemsPerPage, () => {
+    currentPage.value = 1 // 每当条目数变化时，将当前页重置为第一页
+    getAllCardsService()// 获取当前页的数据
+})
+
+const onPageChange = (page) => {
+    currentPage.value = page
+}
 
 const showCardBody = (index) => {
     dialogVisible.value = true
-    cardTitle.value = cardArr.value.data[index].cardTitle
-    cardBody.value = cardArr.value.data[index].cardBody
-    publicationDate.value = cardArr.value.data[index].publicationDate
-    expirationDate.value = cardArr.value.data[index].expirationDate
-    cardId.value = cardArr.value.data[index].cardId
+    const moveSteps = (currentPage.value-1)*itemsPerPage.value
+    cardTitle.value = cardArr.value[index+moveSteps].cardTitle
+    cardBody.value = cardArr.value[index+moveSteps].cardBody
+    publicationDate.value = cardArr.value[index+moveSteps].publicationDate
+    expirationDate.value = cardArr.value[index+moveSteps].expirationDate
+    cardId.value = cardArr.value[index+moveSteps].cardId
 }
 
 const getAllCardsService = async () => {
-    cardArr.value = await getAllCards()
+    const cardData = await searchCard(searchInput.value)
+    cardArr.value = cardData.data.filter(card => card.visible === false)
+    const start = (currentPage.value - 1) * itemsPerPage.value;
+    const end = start + itemsPerPage.value;
+    displayCardArr.value = cardArr.value.slice(start, end);
+    totalCards.value = cardArr.value.length
 }
 getAllCardsService()
 
@@ -41,6 +65,7 @@ const formatISODate = (isoString) => {
 const deleteCardService = async (id) => {
     await deleteCard(id)
     getAllCardsService()
+    dialogVisible.value = false
 }
 
 const handleClosed = async (cardId) => {
@@ -51,7 +76,7 @@ const handleClosed = async (cardId) => {
     cardData.append('cardBody', cardBody.value)
     cardData.append('publicationDate', formattedpublicationDate )
     cardData.append('expirationDate', formattedExpirationDate )
-    cardData.append('visible', 1)
+    cardData.append('visible', 0)
     if(editMode.value===true) {
         await updateCard(cardId,cardData)
     }
@@ -73,7 +98,7 @@ const editCard = async (cardId) => {
     cardData.append('cardBody', cardBody.value)
     cardData.append('publicationDate', formattedpublicationDate )
     cardData.append('expirationDate', formattedExpirationDate )
-    cardData.append('visible', 1)
+    cardData.append('visible', 0)
     if(editMode.value===false) {
         await updateCard(cardId,cardData)
     }
@@ -81,13 +106,16 @@ const editCard = async (cardId) => {
 }
 
 const handleCheckboxClick = async (index,cardId) => {
+
     // 设置一个延迟，以模拟慢速执行
     await new Promise(resolve => setTimeout(resolve, 250));
 
-    cardTitle.value = cardArr.value.data[index].cardTitle
-    cardBody.value = cardArr.value.data[index].cardBody
-    publicationDate.value = cardArr.value.data[index].publicationDate
-    expirationDate.value = cardArr.value.data[index].expirationDate
+    const moveSteps = (currentPage.value-1)*itemsPerPage.value
+    cardTitle.value = cardArr.value[index+moveSteps].cardTitle
+    cardBody.value = cardArr.value[index+moveSteps].cardBody
+    publicationDate.value = cardArr.value[index+moveSteps].publicationDate
+    expirationDate.value = cardArr.value[index+moveSteps].expirationDate
+
 
     const cardData = new FormData()
     const formattedExpirationDate = formatISODate(expirationDate.value)
@@ -102,22 +130,40 @@ const handleCheckboxClick = async (index,cardId) => {
     
     getAllCardsService()
 
-
     // 设置一个延迟，以模拟慢速执行
     await new Promise(resolve => setTimeout(resolve, 250));
+}
+
+const handleSearchClick = async () => {
+    await getAllCardsService()
 }
 
 </script>
 <template>
     <div class="main">
-        <h2>FINISHED ASSIGNMENTS</h2>
+
+        <!-- search -->
+        <div class="search">
+            <el-input v-model="searchInput" @keyup.enter.native="handleSearchClick"></el-input>
+        </div>
+
+        <h2>SEARCH ASSIGNMENTS</h2>
+
         <div class="content">
-            <el-card  v-show="!item.visible" v-for="(item,index) in cardArr.data" :key="item" shadow="hover" @click="showCardBody(index)">
+            <el-card  v-show="!item.visible" v-for="(item,index) in displayCardArr" :key="item" shadow="hover" @click="showCardBody(index)">
                 <div class="cardContent">
                     <div>{{ item.cardTitle }}</div>
                     <el-checkbox v-model="isChecked" @click.prevent.stop="handleCheckboxClick(index,item.cardId)"></el-checkbox>
                 </div>
             </el-card>
+
+            <el-pagination v-show="displayCardArr.length"
+            @current-change="onPageChange"
+            :current-page="currentPage"
+            :page-sizes="[10, 20, 30, 40]"
+            :page-size="itemsPerPage"
+            :total="totalCards"> 
+        </el-pagination>
             
         </div>
 
@@ -184,6 +230,15 @@ const handleCheckboxClick = async (index,cardId) => {
                 transform: translateY(0);
             }
         }
+
+        .search {
+            display: flex;
+            width: 235px;
+            .el-button {
+                background-color: transparent;
+            }
+        }
+
         .content {
             
             .cardContent {
