@@ -147,7 +147,7 @@ const handleSearchClick = async () => {
             <el-input v-model="searchInput" @keyup.enter.native="handleSearchClick"></el-input>
         </div>
 
-        <h2>SEARCH ASSIGNMENTS</h2>
+        <h2>COMPLISHED ASSIGNMENTS</h2>
 
         <div class="content">
             <el-card  v-show="!item.visible" v-for="(item,index) in displayCardArr" :key="item" shadow="hover" @click="showCardBody(index)">
